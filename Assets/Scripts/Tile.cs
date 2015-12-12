@@ -12,7 +12,7 @@ public class Tile : MonoBehaviour {
         PowerPlant
     }
 
-    private TileType type = TileType.Grass;
+    protected TileType type = TileType.Grass;
     public TileType Type
     {
         get { return type; }

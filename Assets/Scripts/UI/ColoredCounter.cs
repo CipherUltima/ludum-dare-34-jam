@@ -37,7 +37,7 @@ public class ColoredCounter : Counter
         last_content = content;
     }
 
-    public static Counter GetByLabel(string label)
+    public static new Counter GetByLabel(string label)
     {
         foreach (Counter c in all_counters)
         {

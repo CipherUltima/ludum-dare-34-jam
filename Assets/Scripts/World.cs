@@ -6,7 +6,14 @@ public class World : MonoBehaviour {
 
     private Tile[,] tiles;
 
-    public static World instance = null;
+    public static World instance;
+
+    public GameObject pause_overlay;
+    public GameObject win_overlay;
+
+    public bool start_paused = true;
+
+    private bool is_paused = false;
 
     private int money = 500;
     private int power_amt = 0;
@@ -31,6 +38,9 @@ public class World : MonoBehaviour {
     {
         instance = this;
         time_last = Time.time;
+        if (start_paused)
+            is_paused = true;
+
         highscore_money = PlayerPrefs.GetInt("HighScoreMoney", 0);
         highscore_pop = PlayerPrefs.GetInt("HighScorePopulation", 0);
 
@@ -53,7 +63,7 @@ public class World : MonoBehaviour {
 	// Update is called once per frame
     void Update()
     {
-        if (Time.time > time_last + 0.5f)
+        if (Time.time > time_last + 0.5f && !is_paused)
         {
             int money_start = money;
             jobs = 0;
@@ -136,6 +146,17 @@ public class World : MonoBehaviour {
             time_last = Time.time;
         }
 
+        if (is_paused && !pause_overlay.activeSelf)
+        {
+            pause_overlay.SetActive(true);
+            MouseController.Disable();
+        }
+        else if (!is_paused && pause_overlay.activeSelf)
+        {
+            pause_overlay.SetActive(false);
+            MouseController.Enable();
+        }
+
         Counter.GetByLabel("Money").content = money.ToString();
         Counter.GetByLabel("Power").content = power_amt.ToString();
         Counter.GetByLabel("Population").content = population.ToString();
@@ -171,23 +192,19 @@ public class World : MonoBehaviour {
         return false;
     }
 
-    public bool CanPlaceAt(int x, int y)
-    {
-        return true;
-    }
-
     public void PlaceTile (Tile.TileType type, int x, int y)
     {
         if (x + 1 > width || y + 1 > height || x < 0 || y < 0)
         {
-            Debug.LogWarning("Aborting tile placement: Invalid position");
-
+            // Invalid position
+            return;
         }
-        if (tiles[x, y] != null && type != Tile.TileType.Grass)
+        else if (tiles[x, y] != null && type != Tile.TileType.Grass)
         {
             if (tiles[x, y].Type != Tile.TileType.Grass)
             {
-                throw new System.InvalidOperationException();
+                // Invalid placement
+                return;
             }
         }
         if (Tile.CanCreate(type))
@@ -202,11 +219,6 @@ public class World : MonoBehaviour {
         Tile t = tiles[x, y];
         Destroy(t.gameObject);
         tiles[x, y] = null;
-    }
-
-    public void ModifyPower (int amount)
-    {
-        power_amt += amount;
     }
 
     public void ModifyMoney (int amount)
@@ -241,5 +253,22 @@ public class World : MonoBehaviour {
         PlayerPrefs.SetInt("HighScoreMoney", highscore_money);
         PlayerPrefs.SetInt("HighScorePopulation", highscore_pop);
         PlayerPrefs.Save();
+    }
+
+    public void TogglePause()
+    {
+        is_paused = !is_paused;
+    }
+
+    public void TriggerWin()
+    {
+        win_overlay.SetActive(true);
+        MouseController.Disable();
+    }
+
+    public void DismissWinScreen()
+    {
+        win_overlay.SetActive(false);
+        MouseController.Enable();
     }
 }

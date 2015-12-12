@@ -2,10 +2,12 @@ using UnityEngine;
 
 public class MouseController : MonoBehaviour
 {
-    Tile.TileType cursor_type = Tile.TileType.House;
+    Tile.TileType cursor_type = Tile.TileType.Grass;
 
     private bool is_dragging = false;
     private Vector3 mouse_pos_last = new Vector3();
+
+    private static bool is_active = true;
 
     void Start()
     {
@@ -14,6 +16,8 @@ public class MouseController : MonoBehaviour
 
     void Update()
     {
+        if (!is_active)
+            return;
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 world_point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -52,5 +56,15 @@ public class MouseController : MonoBehaviour
     public void SetCursorType(Tile.TileType type)
     {
         cursor_type = type;
+    }
+
+    public static void Disable()
+    {
+        is_active = false;
+    }
+
+    public static void Enable()
+    {
+        is_active = true;
     }
 }

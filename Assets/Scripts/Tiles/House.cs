@@ -4,18 +4,19 @@ using System.Collections.Generic;
 public class House : Tile
 {
     public const int POWER_AMT = 1;
-    public const int COST = 15;
+    public new const int COST = 15;
     public const int UPKEEP = 3;
     public const int OCCUPANCY = 5;
 
-    public const string name = "House";
-    public const string sprite_name = "Sprites/House";
+    public const string NAME = "House";
+    public const string SPRITE_NAME = "Sprites/House";
 
     public static int num_houses = 0;
 
     // Use this for initialization
     void Start()
     {
+        type = TileType.House;
         num_houses++;
         World.instance.ModifyMoney(-COST);
     }
@@ -27,13 +28,13 @@ public class House : Tile
 
     new public static Tile CreateNew(int x, int y)
     {
-        GameObject obj = Tile.MakeObject(name, sprite_name);
+        GameObject obj = Tile.MakeObject(NAME, SPRITE_NAME);
         House h = obj.AddComponent<House>();
         obj.transform.position = new Vector3(x, y, 0);
         return h;
     }
 
-    new public static bool CanCreate()
+    public static bool CanCreate()
     {
         return World.instance.CanAfford(COST) && World.instance.HasEnoughPower(POWER_AMT);
     }
@@ -50,6 +51,6 @@ public class House : Tile
 
     public static int EvaluateTaxIncome()
     {
-        return num_houses * UPKEEP;
+        return num_houses * (UPKEEP + Upgrades.GetLevel(Upgrades.Type.TaxIncome));
     }
 }
