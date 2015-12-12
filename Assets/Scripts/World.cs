@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class World : MonoBehaviour {
@@ -15,6 +16,9 @@ public class World : MonoBehaviour {
     private int goods = 0;
     private int money_diff = 0;
 
+    private int highscore_money = 0;
+    private int highscore_pop = 0;
+
     [SerializeField]
     private int width = 12;
     [SerializeField]
@@ -26,11 +30,25 @@ public class World : MonoBehaviour {
     void Start()
     {
         instance = this;
+        time_last = Time.time;
+        highscore_money = PlayerPrefs.GetInt("HighScoreMoney", 0);
+        highscore_pop = PlayerPrefs.GetInt("HighScorePopulation", 0);
+
         tiles = new Tile[width, height];
         GenerateWorld();
-        time_last = Time.time;
+
         PlaceTile(Tile.TileType.PowerPlant, 5, 5);
+        StartCoroutine(SaveHighScores());
 	}
+
+    IEnumerator SaveHighScores ()
+    {
+        for(;;)
+        {
+            yield return new WaitForSeconds(30.0f);
+            PlayerPrefs.Save();
+        }
+    }
 	
 	// Update is called once per frame
     void Update()
@@ -104,6 +122,17 @@ public class World : MonoBehaviour {
 
             money_diff = money - money_start;
 
+            if (money > highscore_money)
+            {
+                highscore_money = money;
+            }
+            if (population > highscore_pop)
+            {
+                highscore_pop = population;
+            }
+            PlayerPrefs.SetInt("HighScoreMoney", highscore_money);
+            PlayerPrefs.SetInt("HighScorePopulation", highscore_pop);
+
             time_last = Time.time;
         }
 
@@ -114,6 +143,9 @@ public class World : MonoBehaviour {
         Counter.GetByLabel("Unemployed").content = unemployment.ToString();
         Counter.GetByLabel("Goods").content = goods.ToString();
         Counter.GetByLabel("Income").content = money_diff.ToString();
+
+        Counter.GetByLabel("Most Money").content = highscore_money.ToString();
+        Counter.GetByLabel("Most People").content = highscore_pop.ToString();
 	}
 
     void GenerateWorld ()
@@ -200,5 +232,14 @@ public class World : MonoBehaviour {
             return true;
         }
         return false;
+    }
+
+    public void ResetHighScores ()
+    {
+        highscore_money = 0;
+        highscore_pop = 0;
+        PlayerPrefs.SetInt("HighScoreMoney", highscore_money);
+        PlayerPrefs.SetInt("HighScorePopulation", highscore_pop);
+        PlayerPrefs.Save();
     }
 }
