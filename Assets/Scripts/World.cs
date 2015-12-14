@@ -48,6 +48,9 @@ public class World : MonoBehaviour {
         GenerateWorld();
 
         PlaceTile(Tile.TileType.PowerPlant, 5, 5);
+        PlaceTile(Tile.TileType.House, 5, 6);
+        PlaceTile(Tile.TileType.Factory, 6, 5);
+        PlaceTile(Tile.TileType.House, 6, 6);
         StartCoroutine(SaveHighScores());
 	}
 

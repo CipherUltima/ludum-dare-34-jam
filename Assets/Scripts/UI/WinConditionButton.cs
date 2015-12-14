@@ -4,7 +4,7 @@ using System.Collections;
 
 public class WinConditionButton : MonoBehaviour {
 
-    private const int WIN_CONDITION_COST = 15000;
+    private const int WIN_CONDITION_COST = 20000;
 
     private Button button;
     private Text text;
